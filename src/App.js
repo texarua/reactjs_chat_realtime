@@ -1,24 +1,22 @@
-import logo from './logo.svg';
 import './App.css';
 
+import Echo from 'laravel-echo';
+import socketio from 'socket.io-client';
+
+import Message from './component/Message';
+
+ window.io = socketio;
+
 function App() {
+  window.Echo = new Echo({
+      broadcaster: 'socket.io',
+      host: 'http://127.0.0.1:6001/',
+      client: socketio,
+      transports: ["websocket", "polling", "flashsocket"],
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <><Message /></>
   );
 }
 
