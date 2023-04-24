@@ -9,6 +9,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import Trainning from './component/Trainning';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,6 +17,7 @@ root.render(
     <Router>
     <App />
     </Router>
+    <Trainning />
   </React.StrictMode>
 );
 
