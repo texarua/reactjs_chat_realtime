@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Trainning from './component/Hook/Trainning';
 import {
   BrowserRouter as Router,
   Switch,
