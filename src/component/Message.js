@@ -25,13 +25,13 @@ const [channel, setChannel] = useState(1);
             }
         }
     )
-  },[channel]);
+  },[]);
 
-  window.Echo.channel('laravel_database_chatChannel')
-    .listen('.MessageCreated', (response) => {
-      setMessages([...messages, response.message]);
-    })
-    .listen('typing', response => console.log(response));
+  // window.Echo.channel('laravel_database_chatChannel')
+  //   .listen('.MessageCreated', (response) => {
+  //     setMessages([...messages, response.message]);
+  //   })
+  //   .listen('typing', response => console.log(response));
 
   const renderListMessage = () => {
     if(messages.length) {
@@ -93,7 +93,6 @@ const [channel, setChannel] = useState(1);
               }}
             >
               <MDBIcon fas icon="angle-left" />
-              {console.log(messages)}
               <p className="mb-0 fw-bold">Live chat</p>
               <MDBIcon fas icon="times" />
             </MDBCardHeader>

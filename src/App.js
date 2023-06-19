@@ -9,10 +9,17 @@ import {
 } from "react-router-dom";
 import Message from './component/Message';
 import Login from './component/Login';
+import Trainning from './component/Hook/Trainning';
+import { useState } from 'react';
+import MemoParent from './component/Hook/MemoParent';
+import ReducerUse from './component/Hook/ReducerUse';
+import TodoReducer from './component/Hook/TodoReducer';
 
  window.io = socketio;
 
 function App() {
+  const [isShow, setIsShow] = useState(true)
+
   // window.Echo = new Echo({
   //     broadcaster: 'socket.io',
   //     host: 'http://127.0.0.1:6001/',
@@ -25,6 +32,16 @@ function App() {
       <Route exact path="/" Component={Message } />
       <Route path="/login" Component={Login } />
   </Routes>
+
+  // const toggleComponent= () => {
+  //   setIsShow(!isShow);
+  // }
+
+  // return (
+  //   <>
+  //   <div><button onClick={toggleComponent}>Toggle</button></div>
+
+  //   { isShow && <TodoReducer />}</>
   );
 }
 
