@@ -10,33 +10,72 @@ import {
   MDBTextArea,
 } from "mdb-react-ui-kit";
 import React, { useState, useEffect } from 'react';
-import api from './api';
+import api, {getConfig} from './api';
+import socket from './socket';
 
 function Message(props) {
 //   const [isOnline, setIsOnline] = useState(null);
 const [messages, setMessages] = useState([]);
 const [channel, setChannel] = useState(1);
-  useEffect(() => {
-    api.get('/messages').then(
-        response => {
-            if(response.data.length)
-            {
-                setMessages(response.data);
-            }
-        }
-    )
-  },[]);
+const [loginUser, setLoginUser] = useState(JSON.parse(localStorage.getItem('authData'))?.data?.user);
+const [typing, setTyping] = useState({});
 
-  // window.Echo.channel('laravel_database_chatChannel')
-  //   .listen('.MessageCreated', (response) => {
-  //     setMessages([...messages, response.message]);
-  //   })
-  //   .listen('typing', response => console.log(response));
+  useEffect(() => {
+    let config = getConfig(JSON.parse(localStorage.getItem('authData')).data.access_token);
+    api.get(`/messages/${channel}`, config).then(
+        response => {
+          let messageData = response.data?.data?.data;
+          console.log(messageData);
+            if(messageData.length)
+            {
+                setMessages(messageData);
+            }
+          
+        }
+    ) 
+    setTimeout(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    }, 1000);
+  }, []);
+
+
+  window.Echo.connect();
+  window.Echo.private(`user.${loginUser?.id}`)
+  .listen('MessageCreated', (response) => {
+    console.log(messages);
+    setMessages([...messages, response.message]);
+  })
+  
+  window.Echo.private(`chat`)
+  .listenForWhisper(`typing_${channel}`, response => setTyping(response));
+
+
+  
 
   const renderListMessage = () => {
     if(messages.length) {
       return messages.map((message, key) => {
-        return (
+        if (message.user_id == loginUser.id) {
+          return (
+            <div key={key} className="d-flex flex-row justify-content-end mb-4">
+              <div className="p-3 me-3 border" style={{borderRadius: "15px", backgroundColor: "#fbfbfb"}}>
+                <p className="small mb-0">{message.content}</p>
+                <div className="bg-image">
+                     {message.image && (
+                        <img src={message.image}
+                        style={{borderRadius: "15px"}} alt="video"/>
+                      )}
+                      <a href="#!">
+                        <div className="mask"></div>
+                      </a>
+                    </div>
+              </div>
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
+                alt="avatar 1" style={{width: "45px", height: "100%"}} />
+            </div>
+          )
+        } else {
+          return (
             <div key={key} className="d-flex flex-row justify-content-start mb-4">
                 <img
                     src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
@@ -53,31 +92,52 @@ const [channel, setChannel] = useState(1);
                     <p className="small mb-0">
                     {message.content}
                     </p>
-                </div>
+                    <div className="bg-image">
+                      {message.image && (
+                        <img src={message.image}
+                        style={{borderRadius: "15px"}} alt="video"/>
+                      )}
+                      
+                      <a href="#!">
+                        <div className="mask"></div>
+                      </a>
+                    </div>
+                </div>      
             </div>
-        )
+          )
+        }
       })
     }
   }
 
   const sendMessage = (e) => {
-    var key = e.keyCode;
     if (e.which == 13 && !e.shiftKey) {
         e.preventDefault();
+        let config = getConfig(JSON.parse(localStorage.getItem('authData')).data.access_token);
         api.post('/messages', {
-            content: e.target.value
-        }).then(response => console.log( response ))
+            content: e.target.value,
+            channel: 1   
+        }, config).then(response => {})
         e.target.value = '';
     }
   }
 
   const typingMessage = (e) => {
-    // if(e.target.value.length) {
-    //   window.Echo.channel('laravel_database_chatChannel')
-    //   .whisper('typing', {
-    //     username: 'Phu123'
-    //   })
-    // }
+    if(e.target.value.length) {
+      window.Echo.private('chat')
+      .whisper(`typing_${channel}`, {
+        username: loginUser.name,
+        user_id: loginUser.id,
+        is_typing: true
+      })
+    } else {
+      window.Echo.private('chat')
+      .whisper(`typing_${channel}`, {
+        username: loginUser.name,
+        user_id: loginUser.id,
+        is_typing: false
+      })
+    }
   }
 
   return (
@@ -171,7 +231,18 @@ const [channel, setChannel] = useState(1);
                   <p className="small mb-0">...</p>
                 </div>
               </div> */}
+              {typing 
+              && typing.is_typing 
+              && loginUser.id !== typing.user_id 
+              && (
+                <div className="doctor-typing flex ml-2">
+                  <img
+                    src={process.env.PUBLIC_URL + '/Message/img/typing_message.svg'}
+                  />
+                </div>
 
+              )}
+              
               <MDBTextArea
                 className="form-outline"
                 label="Type your message"

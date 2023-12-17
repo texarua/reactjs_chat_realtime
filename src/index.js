@@ -10,16 +10,13 @@ import {
   Route,
   Link
 } from "react-router-dom";
-import Trainning from './component/Trainning';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
     <Router>
     <App />
     </Router>
-    <Trainning />
-  </React.StrictMode>
+    // <Trainning />
 );
 
 // If you want to start measuring performance in your app, pass a function
