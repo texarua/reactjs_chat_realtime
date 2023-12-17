@@ -27,11 +27,11 @@ const navigate = useNavigate();
 
 const doLogin = (e) => {
   e.preventDefault();
-  api.post('/login', loginData, {
-    withCredentials: true
+  api.post('/auth/login', loginData, {
   }).then(
     response => {
       console.log(response);
+      localStorage.setItem('authData', JSON.stringify(response.data))
         // setCookie('authData', JSON.stringify(response.data));
         // navigate('/');
     }
